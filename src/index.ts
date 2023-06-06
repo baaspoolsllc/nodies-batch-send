@@ -17,7 +17,7 @@ const addressesFilePath = "../input/addresses.csv"
 async function main() {
 
     const walletPassPhrase = await askQuestion('Enter your wallet passphrase: ');
-    const amount = await askQuestion('Enter the amount to send to each receiver (POKT): ');
+    const amount = await askQuestion('Enter the uPokt amount to send each receiver. [Note this is not POKT amount]: ');
     const rpcProviderUrl = await askQuestion('Enter your POKT RPC Provider URL: ');
 
     if (!isValidFilePath(keyFilePath)) {
