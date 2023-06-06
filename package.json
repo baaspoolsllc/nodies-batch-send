@@ -1,0 +1,16 @@
+{
+  "name": "poktjs-csv-sender",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "license": "MIT",
+  "dependencies": {
+    "@pokt-foundation/pocketjs-provider": "^2.1.0",
+    "@pokt-foundation/pocketjs-relayer": "^2.1.0",
+    "@pokt-foundation/pocketjs-signer": "^2.1.0",
+    "@pokt-foundation/pocketjs-transaction-builder": "^2.2.0-rc.3",
+    "@pokt-foundation/pocketjs-utils": "^2.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.2.5"
+  }
+}

@@ -1,0 +1,16 @@
+# TypeScript
+*.tsbuildinfo
+*.js
+*.js.map
+
+# Build output
+/dist
+
+# Dependency directories
+node_modules
+
+# Environment variables
+.env
+
+#jetbrains
+.idea
