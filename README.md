@@ -21,7 +21,7 @@ This script allows you to send a specified amount of POKT tokens to multiple rec
    npm install && npm run build && npm run start
    ```
 
-6. Follow the prompts to enter the necessary information such as the amount, and POKT RPC provider URL.
+6. Follow the prompts to enter the necessary information such as the amount in `uPokt`, and POKT RPC provider URL.
 
 ## Script Description
 1. The script will ask for a confirmation based off your inputs.
