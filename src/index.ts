@@ -15,11 +15,10 @@ const keyFilePath = "../input/wallet.json"
 const addressesFilePath = "../input/addresses.csv"
 
 async function main() {
+
     const walletPassPhrase = await askQuestion('Enter your wallet passphrase: ');
-    const receiverFilePath = await askQuestion('Enter the file path to read from (CSV format): ');
     const amount = await askQuestion('Enter the amount to send to each receiver (POKT): ');
     const rpcProviderUrl = await askQuestion('Enter your POKT RPC Provider URL: ');
-
 
     if (!isValidFilePath(keyFilePath)) {
         console.error('Invalid wallet key file path or file does not exist!');
@@ -51,7 +50,7 @@ async function main() {
         return;
     }
 
-    const receiverData = fs.readFileSync(receiverFilePath, 'utf-8');
+    const receiverData = fs.readFileSync(addressesFilePath, 'utf-8');
     const receiverAddresses = receiverData.split('\n').map(line => line.trim());
 
     if (!isValidCsv(receiverAddresses)) {
