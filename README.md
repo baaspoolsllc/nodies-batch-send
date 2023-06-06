@@ -13,7 +13,7 @@ This script allows you to send a specified amount of POKT tokens to multiple rec
 
 3. Fill out `addresses.csv` in `input` folder with the addresses you'd like to send to
 
-4. Add your wallet PPK to the `input` folder with the specified name `wallet.json`
+4. Add  `wallet.json` in `input` folder. This is the wallet generated from https://wallet.pokt.network and the wallet you'll be sending out of.
 
 5. Run the script
 
