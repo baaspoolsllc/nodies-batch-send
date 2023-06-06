@@ -4,6 +4,7 @@ import * as readline from 'readline';
 import {JsonRpcProvider} from "@pokt-foundation/pocketjs-provider";
 import {KeyManager} from "@pokt-foundation/pocketjs-signer";
 import {TransactionBuilder} from "@pokt-foundation/pocketjs-transaction-builder";
+import * as Path from "path";
 
 
 const rl = readline.createInterface({
@@ -11,17 +12,17 @@ const rl = readline.createInterface({
     output: process.stdout,
 });
 
-const keyFilePath = "../input/wallet.json"
-const addressesFilePath = "../input/addresses.csv"
+const keyFilePath = Path.join(__dirname, "../input/wallet.json")
+const addressesFilePath = Path.join(__dirname, "../input/addresses.csv")
 
 async function main() {
-
+    console.log(__dirname)
     const walletPassPhrase = await askQuestion('Enter your wallet passphrase: ');
     const amount = await askQuestion('Enter the uPokt amount to send each receiver. [Note this is not POKT amount]: ');
     const rpcProviderUrl = await askQuestion('Enter your POKT RPC Provider URL: ');
 
     if (!isValidFilePath(keyFilePath)) {
-        console.error('Invalid wallet key file path or file does not exist!');
+        console.error('Could not find wallet.json in input folder');
         rl.close();
         return;
     }
@@ -33,7 +34,7 @@ async function main() {
     }
 
     if (!isValidFilePath(addressesFilePath)) {
-        console.error('Invalid file path or file does not exist!');
+        console.error('Could not find addresses.csv in input folder');
         rl.close();
         return;
     }
