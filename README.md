@@ -7,7 +7,7 @@ This script allows you to send a specified amount of POKT tokens to multiple rec
 * Note: Use on your own risk. We aren't responsible for any lost of funds using this script.
 ## Usage
 
-1. Clone this repository or copy the script file to your local environment.
+1. Clone this repository or download it.
 
 2. Have Typescript and NPM/Yarn installed
 
