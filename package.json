@@ -10,6 +10,10 @@
     "@pokt-foundation/pocketjs-transaction-builder": "^2.2.0-rc.3",
     "@pokt-foundation/pocketjs-utils": "^2.1.0"
   },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
   "devDependencies": {
     "@types/node": "^20.2.5"
   }

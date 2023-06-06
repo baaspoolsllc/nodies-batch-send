@@ -11,14 +11,17 @@ const rl = readline.createInterface({
     output: process.stdout,
 });
 
+const keyFilePath = "../input/wallet.json"
+const addressesFilePath = "../input/addresses.csv"
+
 async function main() {
-    const keyfilePath = await askQuestion('Enter your wallet key file path (wallet.json): ');
     const walletPassPhrase = await askQuestion('Enter your wallet passphrase: ');
     const receiverFilePath = await askQuestion('Enter the file path to read from (CSV format): ');
     const amount = await askQuestion('Enter the amount to send to each receiver (POKT): ');
     const rpcProviderUrl = await askQuestion('Enter your POKT RPC Provider URL: ');
 
-    if (!isValidFilePath(keyfilePath)) {
+
+    if (!isValidFilePath(keyFilePath)) {
         console.error('Invalid wallet key file path or file does not exist!');
         rl.close();
         return;
@@ -30,7 +33,7 @@ async function main() {
         return;
     }
 
-    if (!isValidFilePath(receiverFilePath)) {
+    if (!isValidFilePath(addressesFilePath)) {
         console.error('Invalid file path or file does not exist!');
         rl.close();
         return;
@@ -63,25 +66,29 @@ async function main() {
         dispatchers: [rpcProviderUrl],
     });
 
-    const walletData = fs.readFileSync(keyfilePath, 'utf-8');
-
-
+    // Init Wallet/Signer
+    const walletData = fs.readFileSync(keyFilePath, 'utf-8');
     const signer = await KeyManager.fromPPK({
         password: walletPassPhrase,
         ppk: walletData,
     });
+
+    // Create TB
     const transactionBuilder = new TransactionBuilder({
         provider,
         signer,
         chainID: "localnet",
     });
 
+    // Responses to save for output file
     const responses: {
         address: string,
         response: string
     }[] = []
-    // Intentionally send out each one by one, we won't do parallel to avoid overloading RPC node.
+
+    // Send logic
     for (const addr of receiverAddresses) {
+        // Intentionally send out each one by one, we won't do parallel to avoid overloading RPC node.
         const sendMsg = transactionBuilder.send({
                 toAddress: addr.toLowerCase(),
                 amount,
@@ -141,21 +148,19 @@ function isValidFilePath(filePath: string): boolean {
 function isValidCsv(receiverAddresses: string[]): boolean {
     const header = receiverAddresses[0];
     if (header != "address") {
-        console.error('malformed addreses.csv');
-        rl.close();
-        return;
+        console.error('malformed addreses.csv header');
+        return false;
     }
     const invalidAddresses = receiverAddresses.slice(1).filter(address => address.length !== 20);
     if (invalidAddresses.length > 0) {
         console.error('Invalid addresses:', invalidAddresses);
-        rl.close();
-        return;
+        return false;
     }
-
     if(receiverAddresses.slice(1).length > 1000) {
         console.error('Avoid batch sending to more than 1K to avoid overloading blocks, wait another 15 minutes and try another 10000');
-        rl.close();
+        return false
     }
+    return true
 }
 
 function isValidPassphrase(passphrase: string): boolean {
