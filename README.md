@@ -4,7 +4,7 @@
 
 This script allows you to send a specified amount of POKT tokens to multiple receiver addresses using the Pocket Network JSON-RPC provider. The receiver addresses are read from a CSV file, and the script sends the specified amount to each address one by one.
 
-* Note: Use on your own risk. BaaS Pools LLC isn't responsible for any lost of funds using this script.
+* Note: Use on your own risk. We aren't responsible for any lost of funds using this script.
 ## Usage
 
 1. Clone this repository or copy the script file to your local environment.
