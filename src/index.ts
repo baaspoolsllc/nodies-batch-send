@@ -3,7 +3,7 @@ import * as readline from 'readline';
 
 import {JsonRpcProvider} from "@pokt-foundation/pocketjs-provider";
 import {KeyManager} from "@pokt-foundation/pocketjs-signer";
-import {TransactionBuilder} from "@pokt-foundation/pocketjs-transaction-builder";
+import {ChainID, TransactionBuilder} from "@pokt-foundation/pocketjs-transaction-builder";
 import * as Path from "path";
 
 
@@ -13,10 +13,9 @@ const rl = readline.createInterface({
 });
 
 const keyFilePath = Path.join(__dirname, "../input/wallet.json")
-const addressesFilePath = Path.join(__dirname, "../input/addresses.csv")
+const addressesFilePath = Path.join(__dirname, "../input/addresses-template.csv")
 
 async function main() {
-    console.log(__dirname)
     const walletPassPhrase = await askQuestion('Enter your wallet passphrase: ');
     const amount = await askQuestion('Enter the uPokt amount to send each receiver. [Note this is not POKT amount]: ');
     const rpcProviderUrl = await askQuestion('Enter your POKT RPC Provider URL: ');
@@ -34,7 +33,7 @@ async function main() {
     }
 
     if (!isValidFilePath(addressesFilePath)) {
-        console.error('Could not find addresses.csv in input folder');
+        console.error('Could not find addresses-template.csv in input folder');
         rl.close();
         return;
     }
@@ -52,13 +51,29 @@ async function main() {
     }
 
     const receiverData = fs.readFileSync(addressesFilePath, 'utf-8');
-    const receiverAddresses = receiverData.split('\n').map(line => line.trim());
+    const receiverAddressesFile = receiverData.split('\n').map(line => line.trim());
 
-    if (!isValidCsv(receiverAddresses)) {
+    if (!isValidCsv(receiverAddressesFile)) {
         console.error('malformed addresses csv');
         rl.close();
         return;
     }
+
+    const receiverAddresses = receiverAddressesFile.slice(1)
+
+
+    console.log(`You are sending ${amount} uPOKT each to ${receiverAddresses.length} addresses.`)
+    console.log(`With ${rpcProviderUrl} as your RPC provider url`)
+    console.log('')
+
+    const confirm = await askQuestion(`Does this seem correct? Confirm by typing yes: `)
+
+    if(!["y", "yes"].includes(confirm)) {
+        console.log(`User confirmation failed, user answered with ${confirm}`)
+        rl.close()
+        return;
+    }
+
 
     // Instantiate a provider for querying information on the chain!
     const provider = new JsonRpcProvider({
@@ -77,7 +92,7 @@ async function main() {
     const transactionBuilder = new TransactionBuilder({
         provider,
         signer,
-        chainID: "localnet",
+        chainID: process.env.chainId as ChainID || "mainnet"
     });
 
     // Responses to save for output file
@@ -88,6 +103,8 @@ async function main() {
 
     // Send logic
     for (const addr of receiverAddresses) {
+
+        console.log("Attempting to send to: ", addr)
         // Intentionally send out each one by one, we won't do parallel to avoid overloading RPC node.
         const sendMsg = transactionBuilder.send({
                 toAddress: addr.toLowerCase(),
@@ -110,7 +127,11 @@ async function main() {
     for (const { address, response } of responses) {
         csvContent += `${address},${response}\n`;
     }
-    fs.writeFileSync(`${new Date().toISOString().split('T')[0]}-results.csv`, csvContent, 'utf-8');
+    const outputFileName = `${new Date().toISOString()}-results.csv`
+    const outputPath = Path.join(__dirname, "../", "output", outputFileName)
+    fs.writeFileSync(outputPath, csvContent, 'utf-8');
+    console.log(`Results saved to ${outputPath}`)
+    rl.close()
 }
 
 function askQuestion(question: string): Promise<string> {
@@ -120,13 +141,6 @@ function askQuestion(question: string): Promise<string> {
         });
     });
 }
-
-function convertToCSV(data: any[]): string {
-    const header = Object.keys(data[0]);
-    const rows = data.map((obj) => Object.values(obj));
-    return [header, ...rows].map((row) => row.join(',')).join('\n');
-}
-
 function isValidUrl(url: string): boolean {
     try {
         new URL(url);
@@ -151,7 +165,7 @@ function isValidCsv(receiverAddresses: string[]): boolean {
         console.error('malformed addreses.csv header');
         return false;
     }
-    const invalidAddresses = receiverAddresses.slice(1).filter(address => address.length !== 20);
+    const invalidAddresses = receiverAddresses.slice(1).filter(address => address.length !== 40);
     if (invalidAddresses.length > 0) {
         console.error('Invalid addresses:', invalidAddresses);
         return false;
