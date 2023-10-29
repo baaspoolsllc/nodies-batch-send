@@ -19,5 +19,9 @@ node_modules
 *.json
 !package-lock.json
 
+# input files
+input/*.csv
+!input/addresses-template.csv
+
 # output file
 output/*.csv
